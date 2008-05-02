@@ -156,10 +156,11 @@ init(ctxt: ref Draw->Context, args: list of string)
 				tkgame("reverted...");
 			}
 		"restart" =>
-			map = startmap;
 			actions = nil;
+			score = 0;
 			done = 0;
 			emptysel();
+			map = startmap;
 			drawmap();
 			tkgame("restarted...");
 		"save" =>
