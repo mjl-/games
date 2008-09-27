@@ -1,0 +1,23 @@
+# status
+
+one game for now, but it seems to work just fine!  more to come.
+
+
+# intro
+
+this will be a collection of simple games.  for now it is a collection
+of one game:  blobslay.  this game with hard to pronounce name was
+written after seeing bubblebreak(er?) on a windows mobile phone
+(but before finding out it was a classic).
+
+
+# install
+
+the usual.  make sure there is a mkconfig in this directory
+(symblink/bind to inferno install's mkconfig will do), and "mk
+install".
+
+# licence & author
+
+this code is in the public domain, written by mechiel lukkien,
+reachable at mechiel@ueber.net or mechiel@xs4all.nl.
