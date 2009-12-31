@@ -6,16 +6,28 @@ one game for now, but it seems to work just fine!  more to come.
 # intro
 
 this will be a collection of simple games.  for now it is a collection
-of one game:  blobslay.  this game with hard to pronounce name was
+with one game:  blobslay.  this game with hard to pronounce name was
 written after seeing bubblebreak(er?) on a windows mobile phone
 (but before finding out it was a classic).
 
 
 # install
 
-the usual.  make sure there is a mkconfig in this directory
-(symblink/bind to inferno install's mkconfig will do), and "mk
-install".
+first make sure you have "util" installed.
+
+change mkconfig if you do not have $ROOT set.  "mk" and "mk install"
+to compile and install.
+
+when building from within inferno, insert SYSHOST=Inferno and ROOT=
+in the mk invocations to override the values in the mkconfig.
+
+
+# latest version
+
+the latest version can be found at:
+
+	http://www.ueber.net/code/r/games
+
 
 # licence & author
 

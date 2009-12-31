@@ -1,23 +1,24 @@
 implement BlobSlay;
 
 include "sys.m";
+	sys: Sys;
+	sprint: import sys;
 include "draw.m";
+	draw: Draw;
 include "string.m";
+	str: String;
 include "arg.m";
 include "tk.m";
+	tk: Tk;
 include "tkclient.m";
+	tkclient: Tkclient;
 include "rand.m";
+	rand: Rand;
 include "daytime.m";
-
-sys: Sys;
-draw: Draw;
-str: String;
-tk: Tk;
-tkclient: Tkclient;
-rand: Rand;
-daytime: Daytime;
-
-sprint, fprint, print, fildes: import sys;
+	dt: Daytime;
+include "util0.m";
+	util: Util0;
+	readfile, writefile, pid, killgrp, rev, warn: import util;
 
 t: ref Tk->Toplevel;
 wmctl: chan of string;
@@ -40,7 +41,7 @@ score := 0;
 prevscore := 0;
 high := 0;
 done := 0;
-actions: list of (int, int);
+actions: list of ref (int, int);
 
 tkcmds0 := array[] of {
 "frame .ctl",
@@ -81,7 +82,9 @@ init(ctxt: ref Draw->Context, args: list of string)
 	tk = load Tk Tk->PATH;
 	tkclient = load Tkclient Tkclient->PATH;
 	rand = load Rand Rand->PATH;
-	daytime = load Daytime Daytime->PATH;
+	dt = load Daytime Daytime->PATH;
+	util = load Util0 Util0->PATH;
+	util->init();
 
 	seed := sys->millisec();
 
@@ -90,10 +93,11 @@ init(ctxt: ref Draw->Context, args: list of string)
 	while((c := arg->opt()) != 0)
 		case c {
 		's' =>	seed = int arg->earg();
-		* =>	fprint(fildes(2), "bad option\n");
-			arg->usage();
+		* =>	arg->usage();
 		}
 	args = arg->argv();
+	if(args != nil)
+		arg->usage();
 
 	sys->pctl(Sys->NEWPGRP, nil);
 	tkclient->init();
@@ -124,8 +128,8 @@ init(ctxt: ref Draw->Context, args: list of string)
 	menu := <-wmctl =>
 		case menu {
 		"exit" =>
-			killgrp(sys->pctl(0, nil));
-			exit;
+			killgrp(pid());
+			return;
 		* =>
 			tkclient->wmctl(t, menu);
 		}
@@ -164,7 +168,7 @@ init(ctxt: ref Draw->Context, args: list of string)
 			drawmap();
 			tkgame("restarted...");
 		"save" =>
-			path := sprint("/tmp/blobslay-%d", daytime->now());
+			path := sprint("/tmp/blobslay-%d", dt->now());
 			err := save(path);
 			if(err != nil)
 				tkgame(sprint("saving %q: %s", path, err));
@@ -175,12 +179,12 @@ init(ctxt: ref Draw->Context, args: list of string)
 			y := int hd tl l;
 			if(selmap[x][y]) {
 				delete();
-				actions = (x, y)::actions;
+				actions = ref (x, y)::actions;
 			} else
 				select(x, y);
 			drawmap();
 		* =>
-			fprint(fildes(2), "unknown command: %q\n", cmd);
+			warn(sprint("unknown command: %q", cmd));
 		}
 		tkcmd("update");
 	}
@@ -289,40 +293,25 @@ mark(x, y: int)
 
 highread(): int
 {
-	fd := sys->open(highpath, Sys->OREAD);
-	if(fd == nil) {
-		fprint(fildes(2), "open %q: %r\n", highpath);
-		return 0;
-	}
-	n := sys->read(fd, buf := array[128] of byte, len buf);
-	if(n <= 0)
-		return 0;
-	return int string buf[:n];
+	return int string readfile(highpath, 128);
 }
 
 highwrite(s: int): string
 {
-	fd := sys->create(highpath, Sys->OWRITE, 8r666);
-	if(fd == nil)
-		return sprint("create %q: %r", highpath);
-	if(fprint(fd, "%d", s) < 0)
-		return sprint("writing highscore: %r");
-	return nil;
+	return writefile(highpath, 1, array of byte string s);
 }
 
 save(path: string): string
 {
-	fd := sys->create(path, Sys->OWRITE, 8r666);
-	if(fd == nil)
-		return sprint("open: %r");
+	s := "";
 	for(i := len startmap[0]-1; i >= 0; i--) {
 		for(j := len startmap-1; j >= 0; j--)
-			fprint(fd, "%s", colorchars[startmap[j][i]]);
-		fprint(fd, "\n");
+			s += sprint("%s", colorchars[startmap[j][i]]);
+		s += "\n";
 	}
 	for(l := rev(actions); l != nil; l = tl l)
-		fprint(fd, "%d %d\n", (hd l).t0, (hd l).t1);
-	return nil;
+		s += sprint("%d %d\n", (hd l).t0, (hd l).t1);
+	return writefile(path, 1, array of byte s);
 }
 
 tkgame(s: string)
@@ -380,7 +369,7 @@ tkcmd(s: string): string
 {
 	r := tk->cmd(t, s);
 	if(r != nil && r[0] == '!')
-		fprint(fildes(2), "tkcmd: %q: %s\n", s, r);
+		warn(sprint("tkcmd: %q: %s", s, r));
 	return r;
 }
 
@@ -390,22 +379,9 @@ tkcmds(a: array of string)
 		tkcmd(a[i]);
 }
 
-rev(l: list of (int, int)): list of (int, int)
-{
-	r: list of (int, int);
-	for(; l != nil; l = tl l)
-		r = hd l::r;
-	return r;
-}
-
-killgrp(pid: int)
-{
-	if((fd := sys->open(sprint("/prog/%d/ctl", pid), Sys->OWRITE)) != nil)
-		fprint(fd, "killgrp");
-}
-
 fail(s: string)
 {
-	fprint(fildes(2), "%s\n", s);
+	warn(s);
+	killgrp(pid());
 	raise "fail:"+s;
 }
