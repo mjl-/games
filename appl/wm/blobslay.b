@@ -74,8 +74,10 @@ tkcmds1 := array[] of {
 init(ctxt: ref Draw->Context, args: list of string)
 {
 	sys = load Sys Sys->PATH;
-	if(ctxt == nil)
-		fail("no window context");
+	if(ctxt == nil) {
+		sys->fprint(sys->fildes(2), "no window context\n");
+		raise "fail:context";
+	}
 	draw = load Draw Draw->PATH;
 	str = load String String->PATH;
 	arg := load Arg Arg->PATH;

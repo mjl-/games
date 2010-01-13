@@ -2,6 +2,7 @@
 
 TARG=\
 	blobslay.dis\
+	stones.dis\
 
 SYSMODULES=\
 	arg.m\

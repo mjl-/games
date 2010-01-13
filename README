@@ -1,14 +1,14 @@
 # status
 
-one game for now, but it seems to work just fine!  more to come.
+two games already!
 
 
 # intro
 
-this will be a collection of simple games.  for now it is a collection
-with one game:  blobslay.  this game with hard to pronounce name was
-written after seeing bubblebreak(er?) on a windows mobile phone
-(but before finding out it was a classic).
+this will be a collection of simple games.  currently blobslay and stones.
+blobslay was written after seeing bubblebreak(er?) on a windows mobile phone
+(but before finding out it was a classic).  stones is similar to
+the classic bejeweled.
 
 
 # install
@@ -33,3 +33,8 @@ the latest version can be found at:
 
 this code is in the public domain, written by mechiel lukkien,
 reachable at mechiel@ueber.net or mechiel@xs4all.nl.
+
+
+# todo
+
+- write docs.  see the source for the full rules & todo's for now.
