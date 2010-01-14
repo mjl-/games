@@ -74,19 +74,23 @@ tkcmds1 := array[] of {
 init(ctxt: ref Draw->Context, args: list of string)
 {
 	sys = load Sys Sys->PATH;
-	if(ctxt == nil) {
-		sys->fprint(sys->fildes(2), "no window context\n");
-		raise "fail:context";
-	}
 	draw = load Draw Draw->PATH;
 	str = load String String->PATH;
 	arg := load Arg Arg->PATH;
 	tk = load Tk Tk->PATH;
 	tkclient = load Tkclient Tkclient->PATH;
+	tkclient->init();
 	rand = load Rand Rand->PATH;
 	dt = load Daytime Daytime->PATH;
 	util = load Util0 Util0->PATH;
 	util->init();
+
+	sys->pctl(Sys->NEWPGRP, nil);
+
+	if(ctxt == nil)
+		ctxt = tkclient->makedrawcontext();
+	if(ctxt == nil)
+		fail("no window context");
 
 	seed := sys->millisec();
 
@@ -101,8 +105,6 @@ init(ctxt: ref Draw->Context, args: list of string)
 	if(args != nil)
 		arg->usage();
 
-	sys->pctl(Sys->NEWPGRP, nil);
-	tkclient->init();
 	(t, wmctl) = tkclient->toplevel(ctxt, "", "blobslay", Tkclient->Appl);
 
 	tkcmdchan := chan of string;
