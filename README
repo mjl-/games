@@ -13,10 +13,10 @@ the classic bejeweled.
 
 # install
 
-first make sure you have "util" installed.
+first make sure you have "util" installed, see http://www.ueber.net/code/r/util.
 
-change mkconfig if you do not have $ROOT set.  "mk" and "mk install"
-to compile and install.
+make sure $ROOT is set.  run "mk" to compile and "mk install" to
+install.
 
 when building from within inferno, insert SYSHOST=Inferno and ROOT=
 in the mk invocations to override the values in the mkconfig.
